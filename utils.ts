@@ -8,7 +8,7 @@ export interface Taxi {
 export interface Request {
 	reqId: number;
 	position: number;
-	duration: number;
+	destination: number;
 }
 export interface IRequestsQueue {
 	queue: Request[];
