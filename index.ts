@@ -115,27 +115,7 @@ function dispatch_taxi(request : Request){
 
 }
 
-function find_closest_taxi(request:Request){
-	const availableTaxis = taxis.filter(taxi => taxi.available);
-	if (availableTaxis.length === 0) {
-		log(undefined);
-		return undefined;
-	}
 
-	let closestTaxi = availableTaxis[0];
-	let minDistance = Math.abs(closestTaxi.position - request.position);
-
-	for (let i = 1; i < availableTaxis.length; i++) {
-		const taxi = availableTaxis[i];
-		const distance = Math.abs(taxi.position - request.position);
-		if (distance < minDistance) {
-			minDistance = distance;
-			closestTaxi = taxi;
-		}
-	}
-
-	return closestTaxi;
-}
 async function dispatch_multiple_request() {}
 function print_stats() {}
 

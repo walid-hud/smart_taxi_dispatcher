@@ -12,7 +12,6 @@ export interface Request {
 }
 export interface IRequestsQueue {
 	queue: Request[];
-	queue_size: number;
 }
 export interface IWaitingQueue{
     queue: Request[]
@@ -57,9 +56,3 @@ export const banner = `${Colors.fgYellow}
 ${Colors.reset}
 `;
 
-export const taxis: Taxi[] = [
-	{ id: 1, position: 0, available: true, timeRemaining: 0, totalRides: 0 },
-	{ id: 2, position: 5, available: true, timeRemaining: 0, totalRides: 0 },
-	{ id: 3, position: 10, available: true, timeRemaining: 0, totalRides: 0 },
-	{ id: 4, position: 3, available: true, timeRemaining: 0, totalRides: 0 },
-];
