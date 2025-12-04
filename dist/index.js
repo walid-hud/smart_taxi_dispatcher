@@ -21,7 +21,7 @@ const positions_range = 60;
 function get_random() {
     return Math.ceil(Math.random() * positions_range);
 }
-// the program starts with 4 taxis
+// the program starts with 4 taxis at random positions
 const taxis = [
     {
         id: 1,
