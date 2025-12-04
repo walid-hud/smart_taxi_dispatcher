@@ -1,17 +1,32 @@
+/*
+This project could be solved in many ways (and I choose the most complex and inefficient one 💀).
+The concepts I learned/used here are :
+- asynchronous programming : all taxi rides simulations are async so that none is 
+dependant on the other
+
+- a basic implementation of a queue data structure : the queue enqueues a request when no taxi
+is available and when a taxi becomes available it checks the queue to pick up any pending requests
+
+- node js event emitters : I divided the program into separate events using the eventemitter class
+
+- typescript : I learned how to make a class that implements an interface
+
+*/
 import { number, select } from "@inquirer/prompts";
-import { log, table } from "console";
+import { log } from "console";
 import EventEmitter from "events";
-import { Colors, banner } from "./utils.ts";
+import { Colors, banner } from "./utils.js";
 import {
 	type IRequestsQueue,
 	type Request,
 	type Taxi,
-} from "./utils.ts";
+} from "./utils.js";
 let request_counter = 1;
 const positions_range = 60;
 function get_random() {
 	return Math.ceil(Math.random() * positions_range);
 }
+// the program starts with 4 taxis
 const taxis: Taxi[] = [
 	{
 		id: 1,
@@ -44,9 +59,6 @@ const taxis: Taxi[] = [
 ];
 const requests : Request[] = []
 let debug = log;
-// this is a trick to enable more verbose debugging or disable it when needed
-// debug = ()=>{} // uncomment to disable debugging
-
 // colored loggers because the console ones (warn,error..) don't work for some reason
 function log_info(i: any) {
 	debug(`${Colors.fgBlue}${i}${Colors.reset}`);
@@ -64,7 +76,7 @@ function log_success(i: any) {
 
 const emitter = new EventEmitter();
 
-//queue
+// A basic queue structure for unresolved requests
 class Requests_Queue implements IRequestsQueue {
 	constructor() {}
 	queue: Request[] = [];
@@ -80,23 +92,18 @@ class Requests_Queue implements IRequestsQueue {
 	peek(): Request | undefined {
 		return this.queue[0];
 	}
-
 	isEmpty(): boolean {
 		return this.queue.length === 0;
-	}
-
-	size(): number {
-		return this.queue.length;
 	}
 
 }
 
 const requests_queue = new Requests_Queue()
-// events
 
+// events
 async function on_taxi_available(taxi: Taxi) {
 	if(requests_queue.isEmpty()){
-		log_error("requests queue is currently empty")
+		log_error("waiting queue is currently empty")
 		return		
 	}
 	const pending_request = requests_queue.peek()
@@ -149,6 +156,53 @@ async function dispatch_request() {
 	};
 	emitter.emit("request_dispatch", request);
 }
+
+async function dispatch_multiple_request(){
+	log_info("requests that cannot be resolved immediately will be pushed to the waiting queue")
+	const number_of_request = await number({
+		message:"how many request you want to dispatch ? : ",
+		min:1,
+		max:20,
+		required:true,
+	
+	})
+	for(let i  = 0 ; i < number_of_request ; i++){
+		const request: Request = {
+		position: await number({
+			message: "enter request position :",
+			min: 1,
+			max: positions_range,
+			required: true,
+		}),
+		destination: await number({
+			message: "enter destination :",
+			min: 1,
+			max: positions_range,
+			required: true,
+		}),
+		reqId: request_counter++,
+	};
+	emitter.emit("request_dispatch", request);
+	}
+}
+
+function print_stats(){
+	log_success("\n========== SIMULATION STATISTICS ==========")
+	log_info(`Total Requests Processed: ${requests.length}`)
+	log_info(`Requests Waiting in Queue: ${requests_queue.queue.length}`)
+	log_info(`\n--- Taxi Statistics ---`)
+	
+	taxis.forEach(taxi => {
+		log_info(`Taxi ID: ${taxi.id}`)
+		log_info(`  Position: ${taxi.position}`)
+		log_info(`  Available: ${taxi.available ? "Yes" : "No"}`)
+		log_info(`  Total Rides: ${taxi.totalRides}`)
+	})
+	
+	log_success("\n==========================================\n")
+}
+
+
 function find_available_taxi(request: Request) {
 	const availableTaxis = taxis.filter((taxi) => taxi.available);
 	if (availableTaxis.length === 0) {
@@ -196,6 +250,12 @@ async function start_simulation() {
 			case choices[0]:
 				await dispatch_request();
 				break;
+			case choices[1]:
+				await dispatch_multiple_request()
+				break
+			case choices[2]:
+				print_stats()
+				break				
 			default :
 			exit=true
 			break

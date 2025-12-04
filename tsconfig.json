@@ -3,13 +3,13 @@
     "target": "esnext",              
     "module": "nodenext",            
     "rootDir": "./src",                 
-    "outDir": "./dist",              
+    "outDir": "./dist",      
+    "noUnusedLocals": true,        
     "strict": true,                  
     "esModuleInterop": true,         
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true 
+    // "noEmit": true // Remove or comment out this line to allow emitting files
   },
   "include": ["src/**/*"],         
   "exclude": ["node_modules"]        
